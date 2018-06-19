@@ -1,4 +1,5 @@
 # Sitecore 9 Installer
+# Credits to George Chang - https://blogs.perficient.com/sitecore/2017/10/23/how-to-install-sitecore-9-with-the-sitecore-install-framework/
 
 # Parameters 
 $installConfig =
