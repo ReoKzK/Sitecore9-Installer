@@ -27,7 +27,7 @@ $installConfig =
 
 if ($installConfig.IsDependenciesFolderRelative -eq $TRUE)
 {
-	$dependenciesRoot = Join-Path $PSScriptRoot -ChildPath $installConfig.DependenciesFolder
+    $dependenciesRoot = Join-Path $PSScriptRoot -ChildPath $installConfig.DependenciesFolder
 }
 
 $licensePath = Join-Path $dependenciesRoot -ChildPath $installConfig.LicenseFile
@@ -115,8 +115,8 @@ function Set-Environment
 {
     try
     {
-		Write-Host "Setting localenv in Web.config"
-	
+        Write-Host "Setting localenv in Web.config"
+    
         $SitecoreSiteRoot = Join-Path $installConfig.WebRoot -ChildPath $sitecoreSiteName
         
         $webConfigPath = "$SitecoreSiteRoot\Web.config"
