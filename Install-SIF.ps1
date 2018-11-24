@@ -15,7 +15,7 @@ Get-PSRepository SitecoreGallery -ErrorVariable errors -ErrorAction SilentlyCont
 
 if ($errors.Count -gt 0)
 {
-	Write-Host "Resitering SitecoreGallery MyGet repository"
+    Write-Host "Resitering SitecoreGallery MyGet repository"
     Register-PSRepository -Name SitecoreGallery -SourceLocation https://sitecore.myget.org/F/sc-powershell/api/v2
 }
 

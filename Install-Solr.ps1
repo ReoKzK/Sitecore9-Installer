@@ -49,11 +49,12 @@ function downloadAndUnzipIfRequired
         Expand-Archive $toolZip -DestinationPath $installRoot
     }
 }
-# download & extract the solr archive to the right folder
+
+# Download & extract the solr archive to the right folder
 $solrZip = "$downloadFolder\$solrName.zip"
 downloadAndUnzipIfRequired "Solr" $solrRoot $solrZip $solrPackage $installFolder
 
-# download & extract the nssm archive to the right folder
+# Download & extract the nssm archive to the right folder
 $nssmZip = "$downloadFolder\nssm-$nssmVersion.zip"
 downloadAndUnzipIfRequired "NSSM" $nssmRoot $nssmZip $nssmPackage $installFolder
 
@@ -65,7 +66,7 @@ if($jreVal -ne $JREPath)
     [Environment]::SetEnvironmentVariable("JAVA_HOME", $JREPath, [EnvironmentVariableTarget]::Machine)
 }
 
-# if we're using HTTP
+# If we're using HTTP
 if($solrSSL -eq $false)
 {
     # Update solr cfg to use right host name
@@ -92,7 +93,7 @@ if($solrHost -ne "localhost")
     }
 }
 
-# if we're using HTTPS
+# If we're using HTTPS
 if($solrSSL -eq $true)
 {
     # Generate SSL cert
@@ -152,16 +153,21 @@ if(!($svc))
     &"$installFolder\nssm-$nssmVersion\win64\nssm.exe" install "$solrName" "$solrRoot\bin\solr.cmd" "-f" "-p $solrPort"
     $svc = Get-Service "$solrName" -ErrorAction SilentlyContinue
 }
+
 if($svc.Status -ne "Running")
 {
     Write-Host "Starting Solr service"
     Start-Service "$solrName"
 }
 
-# finally prove it's all working
+# Finally prove it's all working
+
 $protocol = "http"
+
 if($solrSSL -eq $true)
 {
     $protocol = "https"
 }
+
 Invoke-Expression "start $($protocol)://$($solrHost):$solrPort/solr/#/"
+
