@@ -4,15 +4,15 @@
 # Parameters config
 $installConfig =
 @{
-    SitecoreVersion = "9.0.2 rev. 180604",
+    SitecoreVersion = "9.0.2 rev. 180604"
 
-    Prefix = "sc90"
-    WebRoot = "C:\inetpub\wwwroot",
+    Prefix = "sc902.test"
+    WebRoot = "C:\inetpub\wwwroot"
     
     # Dependencies
-    DependenciesFolder = "Dependencies",
-    IsDependenciesFolderRelative = $TRUE,
-    LicenseFile = "license.xml",
+    DependenciesFolder = "Dependencies"
+    IsDependenciesFolderRelative = $TRUE
+    LicenseFile = "license.xml"
 
     # SQL Server
     SqlServer = "DESKTOP-5S7KJRS"
@@ -22,7 +22,7 @@ $installConfig =
     # Solr
     SolrUrl = "https://localhost:8983/solr"
     SolrRoot = "c:\Program Files\solr-6.6.2"
-    SolrService = "solr622"
+    SolrService = "solr622-1"
 }
 
 if ($installConfig.IsDependenciesFolderRelative -eq $TRUE)
@@ -34,6 +34,7 @@ $licensePath = Join-Path $dependenciesRoot -ChildPath $installConfig.LicenseFile
 
 $XConnectCollectionService = "$($installConfig.Prefix).xconnect"
 $sitecoreSiteName = "$($installConfig.Prefix).local"
+$certificateName = "$($installConfig.Prefix).xconnect_client" 
 
 function Install-XConnect 
 {
@@ -41,7 +42,7 @@ function Install-XConnect
     $certParams = 
     @{     
         Path = "$dependenciesRoot\xconnect-createcert.json"     
-        CertificateName = "$($installConfig.Prefix).xconnect_client" 
+        CertificateName = $certificateName 
     } 
     
     Install-SitecoreConfiguration @certParams -Verbose
@@ -62,7 +63,7 @@ function Install-XConnect
     $xconnectParams = 
     @{
         Path = "$dependenciesRoot\xconnect-xp0.json"     
-        Package = "$dependenciesRoot\$($installConfig.SitecoreVersion) (OnPrem)_xp0xconnect.scwdp.zip"
+        Package = "$dependenciesRoot\Sitecore $($installConfig.SitecoreVersion) (OnPrem)_xp0xconnect.scwdp.zip"
         LicenseFile = $licensePath
         Sitename = $XConnectCollectionService   
         XConnectCert = $certParams.CertificateName    
@@ -94,7 +95,7 @@ function Install-Sitecore
     $sitecoreParams = 
     @{
         Path = "$dependenciesRoot\sitecore-XP0.json"
-        Package = "$dependenciesRoot\$($installConfig.SitecoreVersion) (OnPrem)_single.scwdp.zip" 
+        Package = "$dependenciesRoot\Sitecore $($installConfig.SitecoreVersion) (OnPrem)_single.scwdp.zip" 
         LicenseFile = $licensePath
         SqlDbPrefix = $installConfig.Prefix
         SqlServer = $installConfig.SqlServer  
@@ -102,7 +103,7 @@ function Install-Sitecore
         SqlAdminPassword = $installConfig.SqlAdminPassword     
         SolrCorePrefix = $installConfig.Prefix
         SolrUrl = $installConfig.SolrUrl
-        XConnectCert = $certParams.CertificateName     
+        XConnectCert = $certificateName
         Sitename = $sitecoreSiteName         
         XConnectCollectionService = "https://$XConnectCollectionService"    
     }
@@ -114,7 +115,9 @@ function Set-Environment
 {
     try
     {
-        $SitecoreSiteRoot = Join-Path $webroot -ChildPath $SitecoreSiteName
+		Write-Host "Setting localenv in Web.config"
+	
+        $SitecoreSiteRoot = Join-Path $installConfig.WebRoot -ChildPath $sitecoreSiteName
         
         $webConfigPath = "$SitecoreSiteRoot\Web.config"
         $localEnvName = "Local"
@@ -126,7 +129,7 @@ function Set-Environment
         
         foreach ($item in $root.appSettings.add)                      # loop through the child items in appsettings
         {
-            if($item.key -eq "localenv:define")                       # If the desired element already exists
+            if ($item.key -eq "localenv:define")                      # If the desired element already exists
             {
                 $RptKeyFound = 1;                                     # Set the found flag
             }
@@ -148,7 +151,7 @@ function Set-Environment
     }
     catch
     {
-        write-host "Failed to set localenv variable to Local" -ForegroundColor Red
+        Write-Host "Failed to set localenv variable to Local" -ForegroundColor Red
         throw
     }
 }
